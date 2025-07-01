@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Nostr Key Wizard Form View -->
+    <record id="view_nostr_key_generator_wizard_form" model="ir.ui.view">
+        <field name="name">nostr.key.generator.wizard.form</field>
+        <field name="model">nostr.key.generator.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Nostr Key">
+                <header>
+                    <!-- Step 1 buttons -->
+                    <button name="action_generate_keys" string="Generate Keys" type="object"
+                            class="btn-primary" attrs="{'invisible': [('step', '!=', 'step1')]}"/>
+
+                    <!-- Step 2 buttons -->
+                    <button name="action_finish" string="Done" type="object"
+                            class="btn-primary" attrs="{'invisible': [('step', '!=', 'step2')]}"/>
+                    <button name="action_back" string="Back" type="object"
+                            class="btn-secondary" attrs="{'invisible': [('step', '!=', 'step2')]}"/>
+
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </header>
+
+                <sheet>
+                    <!-- Step 1: Key Details -->
+                    <div attrs="{'invisible': [('step', '!=', 'step1')]}">
+                        <div class="oe_title">
+                            <h1>Generate New Nostr Key</h1>
+                            <p>Enter the details for your new Nostr key pair</p>
+                        </div>
+
+                        <group>
+                            <field name="name" placeholder="e.g., Main Account, Testing, etc."/>
+                            <field name="partner_id" placeholder="Optional - associate with a partner"/>
+                        </group>
+                    </div>
+
+                    <!-- Step 2: Generated Keys -->
+                    <div attrs="{'invisible': [('step', '!=', 'step2')]}">
+                        <div class="oe_title">
+                            <h1>⚠️ Save Your Keys!</h1>
+                            <p><strong>This is the only time your private key will be shown.</strong></p>
+                        </div>
+
+                        <div class="alert alert-warning" role="alert">
+                            <strong>Important:</strong> Copy and save your private key (nsec) in a secure location.
+                            You will need it to sign messages and prove ownership of your identity.
+                        </div>
+
+                        <group>
+                            <label for="generated_nsec" string="Private Key (nsec)"/>
+                            <field name="generated_nsec" readonly="1" widget="CopyClipboardChar"/>
+                            <div class="text-muted">
+                                <small>Keep this private! Anyone with this key can act as you.</small>
+                            </div>
+
+                            <label for="generated_npub" string="Public Key (npub)"/>
+                            <field name="generated_npub" readonly="1" widget="CopyClipboardChar"/>
+                            <div class="text-muted">
+                                <small>Share this publicly - it's your Nostr identity/address.</small>
+                            </div>
+                        </group>
+                    </div>
+
+                    <!-- Hidden fields -->
+                    <field name="step" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Wizard Action -->
+    <record id="action_nostr_key_generator_wizard" model="ir.actions.act_window">
+        <field name="name">Generate Nostr Key</field>
+        <field name="res_model">nostr.key.generator.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="view_nostr_key_generator_wizard_form"/>
+    </record>
+
+</odoo>

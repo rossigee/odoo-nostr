@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Nostr Relay Tree View -->
+    <record id="view_nostr_relay_tree" model="ir.ui.view">
+        <field name="name">nostr.relay.tree</field>
+        <field name="model">nostr.relay</field>
+        <field name="arch" type="xml">
+            <tree string="Nostr Relays" decoration-success="connection_status == 'connected'"
+                  decoration-danger="connection_status == 'error'" decoration-muted="is_active == False">
+                <field name="name"/>
+                <field name="url"/>
+                <field name="connection_status"/>
+                <field name="is_read"/>
+                <field name="is_write"/>
+                <field name="is_active"/>
+                <field name="last_connected"/>
+                <field name="event_count_read"/>
+                <field name="event_count_write"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Nostr Relay Form View -->
+    <record id="view_nostr_relay_form" model="ir.ui.view">
+        <field name="name">nostr.relay.form</field>
+        <field name="model">nostr.relay</field>
+        <field name="arch" type="xml">
+            <form string="Nostr Relay">
+                <header>
+                    <button name="action_test_connection" string="Test Connection" type="object"
+                            class="btn-primary"/>
+                    <field name="connection_status" widget="badge"
+                           decoration-success="connection_status == 'connected'"
+                           decoration-danger="connection_status == 'error'"
+                           decoration-warning="connection_status == 'disconnected'"
+                           decoration-muted="connection_status == 'unknown'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                        <h3 class="text-muted"><field name="url" placeholder="wss://relay.example.com"/></h3>
+                    </div>
+
+                    <group>
+                        <group string="Configuration">
+                            <field name="is_active"/>
+                            <field name="is_read"/>
+                            <field name="is_write"/>
+                            <field name="description"/>
+                        </group>
+                        <group string="Connection Info">
+                            <field name="last_connected"/>
+                            <field name="connection_error" attrs="{'invisible': [('connection_error', '=', False)]}"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Relay Information" name="relay_info">
+                            <group>
+                                <group string="Details">
+                                    <field name="software"/>
+                                    <field name="contact"/>
+                                    <field name="supported_nips"/>
+                                </group>
+                                <group string="Usage Statistics">
+                                    <field name="event_count_read"/>
+                                    <field name="event_count_write"/>
+                                </group>
+                            </group>
+                            <group string="Relay Info Document (NIP-11)">
+                                <field name="relay_info" nolabel="1" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Add notes about this relay - purpose, reliability, special features, etc."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Nostr Relay Search View -->
+    <record id="view_nostr_relay_search" model="ir.ui.view">
+        <field name="name">nostr.relay.search</field>
+        <field name="model">nostr.relay</field>
+        <field name="arch" type="xml">
+            <search string="Nostr Relays">
+                <field name="name"/>
+                <field name="url"/>
+                <field name="description"/>
+                <filter name="active" string="Active" domain="[('is_active', '=', True)]"/>
+                <filter name="inactive" string="Inactive" domain="[('is_active', '=', False)]"/>
+                <filter name="read_relays" string="Read Relays" domain="[('is_read', '=', True)]"/>
+                <filter name="write_relays" string="Write Relays" domain="[('is_write', '=', True)]"/>
+                <filter name="connected" string="Connected" domain="[('connection_status', '=', 'connected')]"/>
+                <filter name="errors" string="Connection Errors" domain="[('connection_status', '=', 'error')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" domain="[]" context="{'group_by': 'connection_status'}"/>
+                    <filter string="Active" name="group_active" domain="[]" context="{'group_by': 'is_active'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Nostr Relay Action -->
+    <record id="action_nostr_relay" model="ir.actions.act_window">
+        <field name="name">Nostr Relays</field>
+        <field name="res_model">nostr.relay</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_nostr_relay_search"/>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add your first Nostr relay!
+            </p>
+            <p>
+                Nostr relays are servers that store and forward Nostr events.
+                Add the relays you want to read from and publish to.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem id="menu_nostr_relays" name="Relays"
+              parent="menu_nostr_main"
+              action="action_nostr_relay" sequence="20"/>
+
+</odoo>

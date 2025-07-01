@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Nostr Key Tree View -->
+    <record id="view_nostr_key_tree" model="ir.ui.view">
+        <field name="name">nostr.key.tree</field>
+        <field name="model">nostr.key</field>
+        <field name="arch" type="xml">
+            <tree string="Nostr Keys" decoration-info="vault_key_id == False" decoration-success="vault_key_id != False">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="key_type"/>
+                <field name="has_private_key" string="Private Key"/>
+                <field name="public_key"/>
+                <field name="created_date"/>
+                <field name="vault_key_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Nostr Key Form View -->
+    <record id="view_nostr_key_form" model="ir.ui.view">
+        <field name="name">nostr.key.form</field>
+        <field name="model">nostr.key</field>
+        <field name="arch" type="xml">
+            <form string="Nostr Key">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" attrs="{'readonly': [('id', '!=', False)]}"/></h1>
+                        <h3 class="text-muted"><field name="partner_id" attrs="{'readonly': [('id', '!=', False)]}"/></h3>
+                    </div>
+
+
+                    <group>
+                        <group string="Public Key">
+                            <label for="public_key" string="Public Key (npub)"/>
+                            <field name="public_key" readonly="1" widget="CopyClipboardChar"/>
+                        </group>
+                        <group string="Details">
+                            <field name="key_type" readonly="1"/>
+                            <field name="created_date" readonly="1"/>
+                            <field name="vault_key_id" readonly="1" groups="base.group_system"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Add any notes about this key pair - purpose, usage, etc."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Nostr Key Search View -->
+    <record id="view_nostr_key_search" model="ir.ui.view">
+        <field name="name">nostr.key.search</field>
+        <field name="model">nostr.key</field>
+        <field name="arch" type="xml">
+            <search string="Nostr Keys">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="public_key"/>
+                <filter name="has_private" string="With Private Key" domain="[('vault_key_id', '!=', False)]"/>
+                <filter name="public_only" string="Public Key Only" domain="[('vault_key_id', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Partner" name="group_partner" domain="[]" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Key Type" name="group_key_type" domain="[]" context="{'group_by': 'key_type'}"/>
+                    <filter string="Has Private Key" name="group_private" domain="[]" context="{'group_by': 'has_private_key'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Nostr Key Action -->
+    <record id="action_nostr_key" model="ir.actions.act_window">
+        <field name="name">Nostr Keys</field>
+        <field name="res_model">nostr.key</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_nostr_key_search"/>
+        <field name="context">{'default_create_action': 'wizard'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create or import your first Nostr key!
+            </p>
+            <p>
+                Use <strong>Generate New Key</strong> to create a new key pair, or<br/>
+                <strong>Import Existing Key</strong> to import nsec/npub keys.<br/>
+                All private keys are securely stored in the vault.
+            </p>
+        </field>
+    </record>
+
+    <!-- Partner Form View Extension -->
+    <record id="view_partner_form_nostr" model="ir.ui.view">
+        <field name="name">res.partner.form.nostr</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Nostr Keys" name="nostr_keys">
+                    <group>
+                        <group>
+                            <field name="nostr_key_count"/>
+                            <field name="active_nostr_key_id"/>
+                        </group>
+                        <group>
+                            <button name="action_view_nostr_keys" string="View All Keys" type="object"
+                                    class="btn-primary" attrs="{'invisible': [('nostr_key_count', '=', 0)]}"/>
+                            <button name="generate_nostr_key" string="Generate New Key" type="object"
+                                    class="btn-success"/>
+                        </group>
+                    </group>
+                    <field name="nostr_key_ids" readonly="1">
+                        <tree>
+                            <field name="name"/>
+                            <field name="key_type"/>
+                            <field name="public_key"/>
+                            <field name="created_date"/>
+                        </tree>
+                    </field>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+    <!-- Menu Items -->
+    <menuitem id="menu_nostr_main" name="Nostr" sequence="50"
+              action="action_nostr_key"
+              web_icon="nostr_manager,static/description/icon.png"/>
+
+    <menuitem id="menu_nostr_keys" name="Keys"
+              parent="menu_nostr_main"
+              action="action_nostr_key" sequence="10"/>
+
+    <menuitem id="menu_generate_nostr_key" name="Generate New Key"
+              parent="menu_nostr_main"
+              action="action_nostr_key_generator_wizard" sequence="5"/>
+
+    <menuitem id="menu_import_nostr_key" name="Import Existing Key"
+              parent="menu_nostr_main"
+              action="action_nostr_key_import_wizard" sequence="6"/>
+
+</odoo>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Nostr Key Import Wizard Form View -->
+    <record id="view_nostr_key_import_wizard_form" model="ir.ui.view">
+        <field name="name">nostr.key.import.wizard.form</field>
+        <field name="model">nostr.key.import.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Import Nostr Key">
+                <header>
+                    <!-- Step 1 buttons -->
+                    <button name="action_validate_import" string="Validate &amp; Continue" type="object"
+                            class="btn-primary" attrs="{'invisible': [('step', '!=', 'step1')]}"/>
+
+                    <!-- Step 2 buttons -->
+                    <button name="action_import_key" string="Import Key" type="object"
+                            class="btn-primary" attrs="{'invisible': [('step', '!=', 'step2')]}"/>
+                    <button name="action_back" string="Back" type="object"
+                            class="btn-secondary" attrs="{'invisible': [('step', '!=', 'step2')]}"/>
+
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </header>
+
+                <sheet>
+                    <!-- Step 1: Import Details -->
+                    <div attrs="{'invisible': [('step', '!=', 'step1')]}">
+                        <div class="oe_title">
+                            <h1>Import Existing Nostr Key</h1>
+                            <p>Import an existing nsec (private key) or npub (public key only)</p>
+                        </div>
+
+                        <group>
+                            <field name="name" placeholder="e.g., Imported Main Key, Contact Key, etc."/>
+                            <field name="partner_id" placeholder="Optional - associate with a partner"/>
+                        </group>
+
+                        <group string="Key to Import (choose one)">
+                            <field name="import_nsec" placeholder="nsec1... (private key - will derive npub automatically)"
+                                   attrs="{'required': [('import_npub', '=', False)]}"/>
+                            <div class="text-muted" attrs="{'invisible': [('import_nsec', '=', False)]}">
+                                <small>🔐 Importing nsec will give you full signing capability</small>
+                            </div>
+
+                            <field name="import_npub" placeholder="npub1... (public key only - read-only contact)"
+                                   attrs="{'required': [('import_nsec', '=', False)]}"/>
+                            <div class="text-muted" attrs="{'invisible': [('import_npub', '=', False)]}">
+                                <small>👁️ Importing npub creates a read-only contact (no signing)</small>
+                            </div>
+                        </group>
+
+                        <div class="alert alert-info">
+                            <strong>Note:</strong> Provide either an nsec OR npub, not both.
+                            nsec imports will automatically derive the matching npub.
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Confirm Import -->
+                    <div attrs="{'invisible': [('step', '!=', 'step2')]}">
+                        <div class="oe_title">
+                            <h1>Confirm Key Import</h1>
+                            <p>Review the key details before importing</p>
+                        </div>
+
+                        <group>
+                            <field name="import_type" readonly="1"/>
+
+                            <label for="imported_npub" string="Public Key (npub)"/>
+                            <field name="imported_npub" readonly="1" widget="CopyClipboardChar"/>
+                            <div class="text-muted">
+                                <small>This will be your public Nostr identity</small>
+                            </div>
+
+                            <div attrs="{'invisible': [('import_type', '!=', 'nsec')]}">
+                                <label for="imported_nsec" string="Private Key (nsec)"/>
+                                <field name="imported_nsec" readonly="1" widget="CopyClipboardChar"/>
+                                <div class="text-muted">
+                                    <small>This key will be securely stored in the vault</small>
+                                </div>
+                            </div>
+                        </group>
+
+                        <div class="alert alert-success" role="status" attrs="{'invisible': [('import_type', '!=', 'nsec')]}">
+                            <strong>Private Key Import:</strong> Your nsec will be securely stored in the vault
+                            and the npub was automatically derived.
+                        </div>
+
+                        <div class="alert alert-info" attrs="{'invisible': [('import_type', '!=', 'npub')]}">
+                            <strong>Public Key Only:</strong> This creates a read-only contact.
+                            You cannot sign messages with this key.
+                        </div>
+                    </div>
+
+                    <!-- Hidden fields -->
+                    <field name="step" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Import Wizard Action -->
+    <record id="action_nostr_key_import_wizard" model="ir.actions.act_window">
+        <field name="name">Import Nostr Key</field>
+        <field name="res_model">nostr.key.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="view_nostr_key_import_wizard_form"/>
+    </record>
+
+</odoo>

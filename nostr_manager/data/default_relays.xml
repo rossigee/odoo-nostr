@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Popular Public Nostr Relays -->
+
+        <record id="relay_damus" model="nostr.relay">
+            <field name="name">Damus</field>
+            <field name="url">wss://relay.damus.io</field>
+            <field name="description">Main relay for Damus iOS client. High traffic, reliable.</field>
+            <field name="is_active">True</field>
+            <field name="is_read">True</field>
+            <field name="is_write">True</field>
+        </record>
+
+        <record id="relay_nostr_band" model="nostr.relay">
+            <field name="name">Nostr.band</field>
+            <field name="url">wss://nostr.band</field>
+            <field name="description">Popular general purpose relay with good performance.</field>
+            <field name="is_active">True</field>
+            <field name="is_read">True</field>
+            <field name="is_write">True</field>
+        </record>
+
+        <record id="relay_nos_lol" model="nostr.relay">
+            <field name="name">nos.lol</field>
+            <field name="url">wss://nos.lol</field>
+            <field name="description">Reliable relay with good uptime and performance.</field>
+            <field name="is_active">True</field>
+            <field name="is_read">True</field>
+            <field name="is_write">True</field>
+        </record>
+
+        <record id="relay_primal" model="nostr.relay">
+            <field name="name">Primal</field>
+            <field name="url">wss://relay.primal.net</field>
+            <field name="description">Relay for Primal client with caching features.</field>
+            <field name="is_active">True</field>
+            <field name="is_read">True</field>
+            <field name="is_write">True</field>
+        </record>
+
+        <record id="relay_snort" model="nostr.relay">
+            <field name="name">Snort</field>
+            <field name="url">wss://relay.snort.social</field>
+            <field name="description">Relay for Snort web client.</field>
+            <field name="is_active">True</field>
+            <field name="is_read">True</field>
+            <field name="is_write">True</field>
+        </record>
+
+        <record id="relay_wellorder" model="nostr.relay">
+            <field name="name">WellOrder</field>
+            <field name="url">wss://nostr-pub.wellorder.net</field>
+            <field name="description">Public relay with good reliability.</field>
+            <field name="is_active">True</field>
+            <field name="is_read">True</field>
+            <field name="is_write">True</field>
+        </record>
+
+        <record id="relay_bitcoiner_social" model="nostr.relay">
+            <field name="name">Bitcoiner Social</field>
+            <field name="url">wss://nostr.bitcoiner.social</field>
+            <field name="description">Bitcoin-focused relay community.</field>
+            <field name="is_active">True</field>
+            <field name="is_read">True</field>
+            <field name="is_write">True</field>
+        </record>
+
+        <record id="relay_orangepill" model="nostr.relay">
+            <field name="name">Orange Pill</field>
+            <field name="url">wss://nostr.orangepill.dev</field>
+            <field name="description">Bitcoin-oriented relay for orange pill community.</field>
+            <field name="is_active">True</field>
+            <field name="is_read">True</field>
+            <field name="is_write">True</field>
+        </record>
+
+        <record id="relay_nostr_wine" model="nostr.relay">
+            <field name="name">Nostr Wine</field>
+            <field name="url">wss://relay.nostr.wine</field>
+            <field name="description">General purpose relay with good performance.</field>
+            <field name="is_active">True</field>
+            <field name="is_read">True</field>
+            <field name="is_write">True</field>
+        </record>
+
+        <record id="relay_nostr_fmt" model="nostr.relay">
+            <field name="name">FMT Relay</field>
+            <field name="url">wss://nostr-relay.fmt.wiz.biz</field>
+            <field name="description">Reliable public relay with good uptime.</field>
+            <field name="is_active">True</field>
+            <field name="is_read">True</field>
+            <field name="is_write">True</field>
+        </record>
+
+        <record id="relay_purplepag_es" model="nostr.relay">
+            <field name="name">Purple Pages</field>
+            <field name="url">wss://purplepag.es</field>
+            <field name="description">Community-focused relay with good moderation.</field>
+            <field name="is_active">True</field>
+            <field name="is_read">True</field>
+            <field name="is_write">True</field>
+        </record>
+
+        <record id="relay_relay_nostr_info" model="nostr.relay">
+            <field name="name">Relay.nostr.info</field>
+            <field name="url">wss://relay.nostr.info</field>
+            <field name="description">General purpose public relay.</field>
+            <field name="is_active">True</field>
+            <field name="is_read">True</field>
+            <field name="is_write">True</field>
+        </record>
+
+    </data>
+</odoo>

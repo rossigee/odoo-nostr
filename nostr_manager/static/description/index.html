@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nostr Key Management</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1, h2 { color: #2c3e50; }
+        .feature { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .warning { background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 5px; }
+        .code { background: #f1f1f1; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>🔐 Nostr Key Management</h1>
+
+    <p>Secure management of Nostr public and private keys with vault integration. Acts as both a Nostr address book (for collecting npubs) and a secure key manager (for managing nsecs).</p>
+
+    <h2>✨ Features</h2>
+
+    <div class="feature">
+        <h3>🧙‍♂️ 2-Step Key Generation Wizard</h3>
+        <p>Clean, secure wizard for generating new Nostr key pairs:</p>
+        <ul>
+            <li><strong>Step 1:</strong> Enter key name and optional partner association</li>
+            <li><strong>Step 2:</strong> View and copy generated nsec/npub (one-time display only)</li>
+        </ul>
+    </div>
+
+    <div class="feature">
+        <h3>🗂️ Dual Purpose: Address Book + Key Manager</h3>
+        <p>Visual distinction in list views:</p>
+        <ul>
+            <li><strong>Address Book Mode:</strong> Store public keys (npubs) only for contact management</li>
+            <li><strong>Key Manager Mode:</strong> Full key pairs with private keys securely stored in vault</li>
+            <li><strong>Color Coding:</strong> Blue for public-only, green for full key pairs</li>
+        </ul>
+    </div>
+
+    <div class="feature">
+        <h3>🔒 Vault Integration</h3>
+        <p>Private keys are never stored in the database:</p>
+        <ul>
+            <li>Secure storage via <span class="code">vault_connector</span> module</li>
+            <li>UUID-based vault key references</li>
+            <li>Vault connectivity checks before operations</li>
+        </ul>
+    </div>
+
+    <div class="feature">
+        <h3>🏷️ Partner Association</h3>
+        <p>Optional partner linking with dedicated tab:</p>
+        <ul>
+            <li>Associate keys with business partners</li>
+            <li>Partner form shows key count and active key</li>
+            <li>Quick key generation from partner view</li>
+        </ul>
+    </div>
+
+    <div class="feature">
+        <h3>💬 Activity Tracking</h3>
+        <p>Full chatter integration:</p>
+        <ul>
+            <li>Field change tracking (name, partner, notes)</li>
+            <li>Message history and comments</li>
+            <li>File attachments (QR codes, backups, etc.)</li>
+            <li>Activity scheduling (key rotation reminders)</li>
+        </ul>
+    </div>
+
+    <div class="feature">
+        <h3>📋 Copy-Friendly Interface</h3>
+        <p>Easy key sharing and management:</p>
+        <ul>
+            <li>Copy buttons next to all key fields</li>
+            <li>Clean key display with proper formatting</li>
+            <li>Public keys safely displayed for sharing</li>
+        </ul>
+    </div>
+
+    <h2>🚀 Usage</h2>
+
+    <h3>Generate New Key</h3>
+    <ol>
+        <li>Go to <strong>Administration > Nostr Key Management > Generate New Key</strong></li>
+        <li>Enter key name and optional partner</li>
+        <li>Click "Generate Keys"</li>
+        <li>Copy and securely save your nsec private key</li>
+        <li>Share your npub public key as needed</li>
+    </ol>
+
+    <h3>Add Public Key Only</h3>
+    <ol>
+        <li>Go to <strong>Administration > Nostr Key Management > Nostr Keys</strong></li>
+        <li>Click "New" to create a record</li>
+        <li>Enter name, partner (optional), and paste npub</li>
+        <li>Save - will be marked as "Public Key Only"</li>
+    </ol>
+
+    <div class="warning">
+        <h3>⚠️ Security Notice</h3>
+        <p><strong>Private keys (nsec) are shown only once during generation.</strong> Make sure to copy and save them securely offline. The application will never display them again for security reasons.</p>
+    </div>
+
+    <h2>🔧 Configuration</h2>
+
+    <h3>Requirements</h3>
+    <ul>
+        <li><strong>vault_connector</strong> module installed and configured</li>
+        <li>HashiCorp Vault server accessible</li>
+        <li>Proper vault environment variables set</li>
+    </ul>
+
+    <h3>Dependencies</h3>
+    <ul>
+        <li><span class="code">base</span> - Core Odoo functionality</li>
+        <li><span class="code">mail</span> - Chatter and activity tracking</li>
+        <li><span class="code">vault_connector</span> - Secure private key storage</li>
+    </ul>
+
+    <h2>📝 Technical Notes</h2>
+
+    <p><strong>Access Control:</strong> Users can create, read, and modify keys. Only system administrators can delete keys from the system.</p>
+
+    <h2>🆔 Version</h2>
+    <p>Version 16.0.1.0 - Compatible with Odoo 16.0</p>
+
+</body>
+</html>
