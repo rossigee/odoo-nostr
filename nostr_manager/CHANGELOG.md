@@ -70,7 +70,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Contributing guidelines
 
 ### Technical Details
-- **Dependencies**: Odoo 16.0+, vault_connector, secp256k1
+- **Dependencies**: Odoo 17.0+, vault_connector, secp256k1
 - **Models**: nostr.key, nostr.relay, res.partner extensions
 - **Wizards**: nostr.key.generator.wizard, nostr.key.import.wizard
 - **Security**: AGPL-3 license, production cryptography

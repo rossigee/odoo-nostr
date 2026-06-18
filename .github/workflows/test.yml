@@ -2,9 +2,9 @@ name: Odoo Module Tests
 
 on:
   push:
-    branches: [ 16.0, develop ]
+    branches: [ 17.0, develop ]
   pull_request:
-    branches: [ 16.0 ]
+    branches: [ 17.0 ]
 
 jobs:
   test:
@@ -27,7 +27,7 @@ jobs:
 
     strategy:
       matrix:
-        odoo-version: ["16.0"]
+        odoo-version: ["17.0"]
         python-version: ["3.11", "3.12"]
 
     steps:
