@@ -19,7 +19,7 @@
     "author": "Ross Golder",
     "website": "http://www.golder.org",
     "category": "Security",
-    "version": "17.0.1.0.0",
+    "version": "17.0.1.0.1",
     "license": "AGPL-3",
     # any module necessary for this one to work correctly
     "depends": [
