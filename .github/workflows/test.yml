@@ -1,15 +1,16 @@
+# yamllint disable rule:truthy
+---
 name: Odoo Module Tests
 
 on:
   push:
-    branches: [ 17.0, develop ]
+    branches: [17.0, develop]
   pull_request:
-    branches: [ 17.0 ]
+    branches: [17.0]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
     services:
       postgres:
         image: postgres:16
@@ -31,242 +32,213 @@ jobs:
         python-version: ["3.11", "3.12"]
 
     steps:
-    - name: Checkout module
-      uses: actions/checkout@v4
-      with:
-        path: nostr_manager
+      - name: Checkout module
+        uses: actions/checkout@v4
+        with:
+          path: nostr_manager
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Cache pip packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-${{ matrix.python-version }}-
+      - name: Cache pip packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
 
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          build-essential \
-          libpq-dev \
-          libxml2-dev \
-          libxslt1-dev \
-          libldap2-dev \
-          libsasl2-dev \
-          libjpeg-dev \
-          zlib1g-dev \
-          libfreetype6-dev \
-          liblcms2-dev \
-          libwebp-dev \
-          libharfbuzz-dev \
-          libfribidi-dev \
-          libxcb1-dev
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            libpq-dev \
+            libxml2-dev \
+            libxslt1-dev \
+            libldap2-dev \
+            libsasl2-dev \
+            libjpeg-dev \
+            zlib1g-dev \
+            libfreetype6-dev \
+            liblcms2-dev \
+            libwebp-dev \
+            libharfbuzz-dev \
+            libfribidi-dev \
+            libxcb1-dev
 
-    - name: Checkout Odoo
-      uses: actions/checkout@v4
-      with:
-        repository: odoo/odoo
-        ref: ${{ matrix.odoo-version }}
-        path: odoo
-        depth: 1
+      - name: Checkout Odoo
+        uses: actions/checkout@v4
+        with:
+          repository: odoo/odoo
+          ref: ${{ matrix.odoo-version }}
+          path: odoo
+          depth: 1
 
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r odoo/requirements.txt
-        # Install cryptographic dependencies for nostr_manager
-        pip install secp256k1 coincurve
-        # Install test dependencies
-        pip install coverage pytest-odoo
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r odoo/requirements.txt
+          pip install secp256k1 coincurve
+          pip install coverage pytest-odoo
 
-    - name: Setup vault_connector dependency
-      run: |
-        # Clone vault_connector module (adjust URL as needed)
-        git clone https://github.com/golder-org/vault-connector.git vault_connector || echo "Vault connector not available, using mock"
+      - name: Setup vault_connector dependency
+        run: |
+          gh_repo="https://github.com/golder-org/vault-connector.git"
+          git clone "$gh_repo" vault_connector || \
+            echo "Vault connector not available, using mock"
 
-    - name: Prepare Odoo addons path
-      run: |
-        mkdir -p addons
-        # Link the module under test
-        ln -s $(pwd)/nostr_manager addons/nostr_manager
-        # Link vault_connector if available
-        if [ -d "vault_connector" ]; then
-          ln -s $(pwd)/vault_connector addons/vault_connector
-        fi
+      - name: Prepare Odoo addons path
+        run: |
+          mkdir -p addons
+          ln -s $(pwd)/nostr_manager addons/nostr_manager
+          if [ -d "vault_connector" ]; then
+            ln -s $(pwd)/vault_connector addons/vault_connector
+          fi
 
-    - name: Initialize Odoo database
-      run: |
-        cd odoo
-        python odoo-bin -d test_db --init=base --stop-after-init --addons-path=../addons
-      env:
-        PGHOST: localhost
-        PGPORT: 5432
-        PGUSER: odoo
-        PGPASSWORD: odoo
+      - name: Initialize Odoo database
+        run: |
+          cd odoo
+          python odoo-bin -d test_db --init=base --stop-after-init --addons-path=../addons
+        env:
+          PGHOST: localhost
+          PGPORT: 5432
+          PGUSER: odoo
+          PGPASSWORD: odoo
 
-    - name: Install module
-      run: |
-        cd odoo
-        python odoo-bin -d test_db --init=nostr_manager --stop-after-init --addons-path=../addons --log-level=info
-      env:
-        PGHOST: localhost
-        PGPORT: 5432
-        PGUSER: odoo
-        PGPASSWORD: odoo
+      - name: Install module
+        run: |
+          cd odoo
+          python odoo-bin -d test_db --init=nostr_manager \
+            --stop-after-init --addons-path=../addons --log-level=info
+        env:
+          PGHOST: localhost
+          PGPORT: 5432
+          PGUSER: odoo
+          PGPASSWORD: odoo
 
-    - name: Run module tests
-      run: |
-        cd odoo
-        coverage run --source=../addons/nostr_manager \
-          odoo-bin -d test_db \
-          --test-enable \
-          --stop-after-init \
-          --addons-path=../addons \
-          --log-level=test \
-          -i nostr_manager
-      env:
-        PGHOST: localhost
-        PGPORT: 5432
-        PGUSER: odoo
-        PGPASSWORD: odoo
+      - name: Run module tests
+        run: |
+          cd odoo
+          coverage run --source=../addons/nostr_manager \
+            odoo-bin -d test_db \
+            --test-enable \
+            --stop-after-init \
+            --addons-path=../addons \
+            --log-level=test \
+            -i nostr_manager
+        env:
+          PGHOST: localhost
+          PGPORT: 5432
+          PGUSER: odoo
+          PGPASSWORD: odoo
 
-    - name: Generate coverage report
-      run: |
-        cd odoo
-        coverage report --include="../addons/nostr_manager/*"
-        coverage xml --include="../addons/nostr_manager/*" -o coverage.xml
+      - name: Generate coverage report
+        run: |
+          cd odoo
+          coverage report --include="../addons/nostr_manager/*"
+          coverage xml --include="../addons/nostr_manager/*" -o coverage.xml
 
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./odoo/coverage.xml
-        flags: unittests
-        name: codecov-${{ matrix.odoo-version }}-py${{ matrix.python-version }}
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./odoo/coverage.xml
+          flags: unittests
+          name: codecov-${{ matrix.odoo-version }}-py${{ matrix.python-version }}
 
-    - name: Check module installability
-      run: |
-        cd odoo
-        # Test upgrade scenario
-        python odoo-bin -d test_db --update=nostr_manager --stop-after-init --addons-path=../addons
-      env:
-        PGHOST: localhost
-        PGPORT: 5432
-        PGUSER: odoo
-        PGPASSWORD: odoo
+      - name: Check module installability
+        run: |
+          cd odoo
+          python odoo-bin -d test_db --update=nostr_manager \
+            --stop-after-init --addons-path=../addons
+        env:
+          PGHOST: localhost
+          PGPORT: 5432
+          PGUSER: odoo
+          PGPASSWORD: odoo
 
-    - name: Lint Python code
-      run: |
-        pip install flake8 black isort
-        # Check Python code style
-        flake8 nostr_manager --max-line-length=88 --extend-ignore=E203,W503
-        # Check import sorting
-        isort --check-only --diff nostr_manager
-        # Check code formatting (informational only)
-        black --check nostr_manager || echo "Code formatting could be improved"
+      - name: Lint Python code
+        run: |
+          pip install flake8 black isort
+          flake8 nostr_manager --max-line-length=88 --extend-ignore=E203,W503
+          isort --check-only --diff nostr_manager
+          black --check nostr_manager || echo "Code formatting could be improved"
 
-    - name: Validate XML files
-      run: |
-        # Install xmllint
-        sudo apt-get install -y libxml2-utils
-        # Validate all XML files
-        find nostr_manager -name "*.xml" -exec xmllint --noout {} \; || exit 1
+      - name: Validate XML files
+        run: |
+          sudo apt-get install -y libxml2-utils
+          find nostr_manager -name "*.xml" -exec xmllint --noout {} \; || exit 1
 
-    - name: Security scan
-      run: |
-        pip install bandit safety
-        # Security scan for Python code
-        bandit -r nostr_manager -f json -o bandit-report.json || true
-        # Check for known security vulnerabilities in dependencies
-        safety check --json --output safety-report.json || true
+      - name: Security scan
+        run: |
+          pip install bandit safety
+          bandit -r nostr_manager -f json -o bandit-report.json || true
+          safety check --json --output safety-report.json || true
 
-    - name: Upload test artifacts
-      uses: actions/upload-artifact@v3
-      if: always()
-      with:
-        name: test-results-${{ matrix.odoo-version }}-py${{ matrix.python-version }}
-        path: |
-          odoo/coverage.xml
-          bandit-report.json
-          safety-report.json
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-results-${{ matrix.odoo-version }}-py${{ matrix.python-version }}
+          path: |
+            odoo/coverage.xml
+            bandit-report.json
+            safety-report.json
 
   validate-manifest:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout module
-      uses: actions/checkout@v4
+      - name: Checkout module
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.11"
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
 
-    - name: Validate manifest
-      run: |
-        python -c "
-        import ast
-        import sys
+      - name: Validate manifest
+        run: |
+          python3 << 'PYEOF'
+          import ast
+          import sys
 
-        # Read and validate __manifest__.py
-        with open('__manifest__.py', 'r') as f:
-            content = f.read()
+          with open('__manifest__.py', 'r') as f:
+              content = f.read()
 
-        try:
-            manifest = ast.literal_eval(content)
-            print('✓ Manifest syntax is valid')
+          try:
+              manifest = ast.literal_eval(content)
+              print('Manifest syntax is valid')
 
-            # Check required fields
-            required_fields = ['name', 'version', 'depends', 'data', 'installable']
-            for field in required_fields:
-                if field not in manifest:
-                    print(f'✗ Missing required field: {field}')
-                    sys.exit(1)
+              required_fields = ['name', 'version', 'depends', 'data', 'installable']
+              for field in required_fields:
+                  if field not in manifest:
+                      print(f'Missing required field: {field}')
+                      sys.exit(1)
 
-            print(f'✓ Module: {manifest[\"name\"]} v{manifest[\"version\"]}')
-            print(f'✓ Dependencies: {manifest[\"depends\"]}')
-            print(f'✓ Installable: {manifest[\"installable\"]}')
+              print(f'Module: {manifest["name"]} v{manifest["version"]}')
+              print(f'Dependencies: {manifest["depends"]}')
+              print(f'Installable: {manifest["installable"]}')
 
-        except Exception as e:
-            print(f'✗ Manifest validation failed: {e}')
-            sys.exit(1)
-        "
+          except Exception as e:
+              print(f'Manifest validation failed: {e}')
+              sys.exit(1)
+          PYEOF
 
   pre-commit:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v4
-      with:
-        python-version: "3.11"
-    - name: Install pre-commit
-      run: |
-        pip install pre-commit
-        # Create minimal pre-commit config if it doesn't exist
-        if [ ! -f ".pre-commit-config.yaml" ]; then
-          cat > .pre-commit-config.yaml << EOF
-        repos:
-        - repo: https://github.com/psf/black
-          rev: 23.3.0
-          hooks:
-          - id: black
-            language_version: python3
-        - repo: https://github.com/pycqa/isort
-          rev: 5.12.0
-          hooks:
-          - id: isort
-        - repo: https://github.com/pycqa/flake8
-          rev: 6.0.0
-          hooks:
-          - id: flake8
-            args: [--max-line-length=88, --extend-ignore=E203,W503]
-        EOF
-        fi
-    - name: Run pre-commit
-      run: |
-        pre-commit install
-        pre-commit run --all-files
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install pre-commit
+        run: pip install pre-commit
+
+      - name: Run pre-commit
+        run: |
+          pre-commit install
+          pre-commit run --all-files
