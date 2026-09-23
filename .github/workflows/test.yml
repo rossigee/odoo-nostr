@@ -153,8 +153,8 @@ jobs:
         run: |
           pip install flake8 black isort
           flake8 nostr_manager --max-line-length=88 --extend-ignore=E203,W503,E501,W504,F401,F811,F841
-          isort --check-only --diff nostr_manager
-          black --check nostr_manager || echo "Code formatting could be improved"
+          isort --check-only --diff --profile=black --line-length=88 nostr_manager
+          black --check --line-length=88 nostr_manager || echo "Code formatting could be improved"
 
       - name: Validate XML files
         run: |
