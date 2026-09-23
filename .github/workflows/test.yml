@@ -86,7 +86,7 @@ jobs:
 
       - name: Setup vault_connector dependency
         run: |
-          gh_repo="https://github.com/golder-org/vault-connector.git"
+          gh_repo="https://github.com/rossigee/odoo-vault-connector.git"
           git clone "$gh_repo" vault_connector || \
             echo "Vault connector not available, using mock"
 
