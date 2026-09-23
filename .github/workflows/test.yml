@@ -100,11 +100,10 @@ jobs:
 
       - name: Install module
         run: |
-          cd odoo
           python odoo-bin -d test_db \
             --no-http \
             --stop-after-init \
-            --addons-path=../addons,./addons \
+            --addons-path="${GITHUB_WORKSPACE}/addons,${GITHUB_WORKSPACE}/odoo/addons" \
             --log-level=info \
             -i nostr_manager
         env:
@@ -115,12 +114,11 @@ jobs:
 
       - name: Run module tests
         run: |
-          cd odoo
-          coverage run --source=../addons/nostr_manager \
+          coverage run --source="${GITHUB_WORKSPACE}/addons/nostr_manager" \
             odoo-bin -d test_db \
             --test-enable \
             --stop-after-init \
-            --addons-path=../addons \
+            --addons-path="${GITHUB_WORKSPACE}/addons,${GITHUB_WORKSPACE}/odoo/addons" \
             --log-level=test \
             -i nostr_manager
         env:
