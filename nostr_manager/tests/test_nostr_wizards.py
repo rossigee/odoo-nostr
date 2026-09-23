@@ -17,6 +17,12 @@ class TestNostrWizards(TransactionCase):
         self.partner = self.env["res.partner"].create(
             {"name": "Wizard Test Partner", "email": "wizard@test.com"}
         )
+        test_private_key_hex = (
+            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+        )
+        self.test_nsec = self.nostr_key_model._hex_to_nsec(test_private_key_hex)
+        public_key_hex = self.nostr_key_model._derive_public_key(test_private_key_hex)
+        self.test_npub = self.nostr_key_model._hex_to_npub(public_key_hex)
 
     @patch(
         "odoo.addons.nostr_manager.models.nostr_key.NostrKey._store_private_key_in_vault"
@@ -53,7 +59,7 @@ class TestNostrWizards(TransactionCase):
         result = wizard.action_generate_keys()
 
         # Should move to step 2 and show generated keys
-        wizard.invalidate_cache()
+        wizard.invalidate_recordset()
         self.assertEqual(wizard.step, "step2")
         self.assertTrue(wizard.generated_nsec)
         self.assertTrue(wizard.generated_npub)
@@ -73,7 +79,7 @@ class TestNostrWizards(TransactionCase):
 
         result = wizard.action_back()
 
-        wizard.invalidate_cache()
+        wizard.invalidate_recordset()
         self.assertEqual(wizard.step, "step1")
         self.assertEqual(result["res_model"], "nostr.key.generator.wizard")
 
@@ -113,7 +119,7 @@ class TestNostrWizards(TransactionCase):
         # Should validate successfully
         result = wizard.action_validate_import()
 
-        wizard.invalidate_cache()
+        wizard.invalidate_recordset()
         self.assertEqual(wizard.step, "step2")
         self.assertEqual(wizard.import_type, "nsec")
         self.assertTrue(wizard.imported_nsec)
@@ -121,19 +127,18 @@ class TestNostrWizards(TransactionCase):
 
     def test_import_wizard_npub_validation(self):
         """Test import wizard npub validation"""
-        # Valid npub import
         wizard = self.import_wizard_model.create(
             {
                 "name": "Import Public Key",
                 "import_nsec": "",
-                "import_npub": "npub1g53xlk3h3lf4dqhzqchvl8rphk6nqcaxn49m5azmcqtftwamg36qqkvp6c",
+                "import_npub": self.test_npub,
                 "step": "step1",
             }
         )
 
         wizard.action_validate_import()
 
-        wizard.invalidate_cache()
+        wizard.invalidate_recordset()
         self.assertEqual(wizard.step, "step2")
         self.assertEqual(wizard.import_type, "npub")
         self.assertFalse(wizard.imported_nsec)
@@ -236,7 +241,7 @@ class TestNostrWizards(TransactionCase):
                 "name": "Import Public Key",
                 "import_type": "npub",
                 "imported_nsec": False,
-                "imported_npub": "npub1g53xlk3h3lf4dqhzqchvl8rphk6nqcaxn49m5azmcqtftwamg36qqkvp6c",
+                "imported_npub": self.test_npub,
                 "step": "step2",
             }
         )
@@ -255,7 +260,7 @@ class TestNostrWizards(TransactionCase):
 
         result = wizard.action_back()
 
-        wizard.invalidate_cache()
+        wizard.invalidate_recordset()
         self.assertEqual(wizard.step, "step1")
         self.assertEqual(result["res_model"], "nostr.key.import.wizard")
 

@@ -15,6 +15,12 @@ class TestNostrKeyManagement(TransactionCase):
         self.partner = self.env["res.partner"].create(
             {"name": "Test Partner", "email": "test@example.com"}
         )
+        test_private_key_hex = (
+            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+        )
+        self.test_nsec = self.nostr_key_model._hex_to_nsec(test_private_key_hex)
+        public_key_hex = self.nostr_key_model._derive_public_key(test_private_key_hex)
+        self.test_npub = self.nostr_key_model._hex_to_npub(public_key_hex)
 
     @patch(
         "odoo.addons.nostr_manager.models.nostr_key.NostrKey._store_private_key_in_vault"
@@ -58,9 +64,6 @@ class TestNostrKeyManagement(TransactionCase):
 
     def test_nsec_import(self):
         """Test importing existing nsec private key"""
-        # Use a valid test nsec (this would need real test data in production)
-        test_nsec = "nsec1qy35v6y8x4lkmqy35v6y8x4lkmqy35v6y8x4lkmqy35v6y8x4lkmq9ycf0d"
-
         with patch(
             "odoo.addons.nostr_manager.models.nostr_key.NostrKey._store_private_key_in_vault"
         ) as mock_vault:
@@ -70,7 +73,7 @@ class TestNostrKeyManagement(TransactionCase):
                 {
                     "name": "Imported Private Key",
                     "partner_id": self.partner.id,
-                    "import_nsec": test_nsec,
+                    "import_nsec": self.test_nsec,
                     "import_npub": None,
                 }
             )
@@ -83,21 +86,19 @@ class TestNostrKeyManagement(TransactionCase):
 
     def test_npub_import(self):
         """Test importing existing npub public key only"""
-        test_npub = "npub1g53xlk3h3lf4dqhzqchvl8rphk6nqcaxn49m5azmcqtftwamg36qqkvp6c"
-
         key = self.nostr_key_model._import_key_pair(
             {
                 "name": "Imported Public Key",
                 "partner_id": self.partner.id,
                 "import_nsec": None,
-                "import_npub": test_npub,
+                "import_npub": self.test_npub,
             }
         )
 
         self.assertEqual(key.name, "Imported Public Key")
         self.assertEqual(key.key_type, "imported")
         self.assertFalse(key.has_private_key)
-        self.assertEqual(key.public_key, test_npub)
+        self.assertEqual(key.public_key, self.test_npub)
         self.assertFalse(key.vault_key_id)
 
     def test_import_validation_errors(self):
@@ -130,17 +131,15 @@ class TestNostrKeyManagement(TransactionCase):
 
     def test_unique_public_key_constraint(self):
         """Test that duplicate public keys are not allowed"""
-        test_npub = "npub1g53xlk3h3lf4dqhzqchvl8rphk6nqcaxn49m5azmcqtftwamg36qqkvp6c"
-
         # Create first key
         self.nostr_key_model._import_key_pair(
-            {"name": "First Key", "import_npub": test_npub}
+            {"name": "First Key", "import_npub": self.test_npub}
         )
 
         # Try to create second key with same npub - should fail
         with self.assertRaises(Exception):  # Database constraint error
             self.nostr_key_model._import_key_pair(
-                {"name": "Duplicate Key", "import_npub": test_npub}
+                {"name": "Duplicate Key", "import_npub": self.test_npub}
             )
 
     def test_has_private_key_computation(self):
@@ -160,7 +159,7 @@ class TestNostrKeyManagement(TransactionCase):
         key_public_only = self.nostr_key_model._import_key_pair(
             {
                 "name": "Public Only",
-                "import_npub": "npub1g53xlk3h3lf4dqhzqchvl8rphk6nqcaxn49m5azmcqtftwamg36qqkvp6c",
+                "import_npub": self.test_npub,
             }
         )
         self.assertFalse(key_public_only.has_private_key)
@@ -199,7 +198,7 @@ class TestNostrKeyManagement(TransactionCase):
 
             # After write operation, it should be cleared
             key.write({"notes": "Test note"})
-            key.refresh()
+            key.invalidate_recordset()
 
             # Field should be cleared to prevent persistent storage
             self.assertFalse(key.generated_private_key)
@@ -221,7 +220,7 @@ class TestNostrKeyManagement(TransactionCase):
             )
 
             # Refresh partner to get updated computed fields
-            self.partner.refresh()
+            self.partner.invalidate_recordset()
 
             # Check partner key relationship
             self.assertEqual(self.partner.nostr_key_count, 1)
