@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -93,16 +93,14 @@ jobs:
           zip_name = f"dist/{repo_name}-{version}.zip"
 
           with zipfile.ZipFile(zip_name, 'w', zipfile.ZIP_DEFLATED) as zf:
-              for root, dirs, files in os.walk('.'):
-                  skip_dirs = ['.git', '__pycache__', '.pytest_cache', 'dist',
-                               '.github', '.gitea', 'venv']
-                  dirs[:] = [d for d in dirs if d not in skip_dirs]
+              for root, dirs, files in os.walk('nostr_manager'):
+                  dirs[:] = [d for d in dirs if d not in
+                             ['__pycache__', '.pytest_cache']]
                   for file in files:
-                      if file.startswith('.') and file not in ['.gitignore']:
+                      if file.endswith('.pyc'):
                           continue
                       file_path = os.path.join(root, file)
-                      arcname = file_path[2:] if file_path.startswith('./') else file_path
-                      zf.write(file_path, arcname)
+                      zf.write(file_path, file_path)
 
           size_kb = os.path.getsize(zip_name) / 1024
           print(f"  {repo_name}: {zip_name} ({size_kb:.1f} KB)")
@@ -137,7 +135,7 @@ jobs:
           EOF
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           body_path: RELEASE_NOTES.md
           draft: false
@@ -145,3 +143,34 @@ jobs:
           files: dist/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install MinIO client
+        run: |
+          MC_VERSION="RELEASE.2025-08-13T08-35-41Z"
+          curl -fsSL "https://github.com/minio/mc/releases/download/${MC_VERSION}/mc.linux-amd64.${MC_VERSION}" -o /tmp/mc
+          chmod +x /tmp/mc
+          /tmp/mc --version
+
+      - name: Upload to MinIO
+        env:
+          MINIO_HOST: ${{ secrets.MINIO_HOST }}
+          MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+          MINIO_BUCKET: ${{ secrets.MINIO_BUCKET }}
+          ODOO_VERSION: "17.0"
+        run: |
+          MINIO_ENDPOINT=$(echo "${MINIO_HOST}" | sed -E 's|^https?://||')
+          /tmp/mc alias set cdn \
+            "https://${MINIO_ENDPOINT}" \
+            "${MINIO_ACCESS_KEY}" \
+            "${MINIO_SECRET_KEY}" \
+            --insecure
+
+          REPO_NAME="${{ steps.version.outputs.repo_name }}"
+          ZIPFILE="dist/${REPO_NAME}-${{ steps.version.outputs.version }}.zip"
+
+          echo "Uploading ${REPO_NAME}..."
+          /tmp/mc cp --insecure "$ZIPFILE" \
+            "cdn/${MINIO_BUCKET}/odoo/custom-modules/${ODOO_VERSION}/${REPO_NAME}/${{ steps.version.outputs.version }}.zip"
+          /tmp/mc cp --insecure "$ZIPFILE" \
+            "cdn/${MINIO_BUCKET}/odoo/custom-modules/${ODOO_VERSION}/${REPO_NAME}/latest.zip"

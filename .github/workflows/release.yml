@@ -33,7 +33,7 @@ jobs:
         run: |
           MANIFEST_VERSION=$(python -c "
           import ast
-          with open('__manifest__.py', 'r') as f:
+          with open('nostr_manager/__manifest__.py', 'r') as f:
               manifest = ast.literal_eval(f.read())
           print(manifest['version'])
           ")
@@ -77,14 +77,15 @@ jobs:
             --exclude='bandit-report.json' \
             --exclude='safety-report.json' \
             --exclude='.github' \
-            ./ release/nostr_manager/
+            --exclude='.gitea' \
+            nostr_manager/ release/nostr_manager/
 
           cd release
           tar -czf nostr_manager-v${{ steps.version.outputs.version }}.tar.gz nostr_manager/
           zip -r nostr_manager-v${{ steps.version.outputs.version }}.zip nostr_manager/
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: v${{ steps.version.outputs.version }}
           name: Nostr Manager v${{ steps.version.outputs.version }}
