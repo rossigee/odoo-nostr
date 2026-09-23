@@ -88,7 +88,11 @@ jobs:
         run: |
           mkdir -p addons
           cp -r nostr_manager addons/
-          git clone --depth 1 https://github.com/rossigee/odoo-vault-connector.git addons/vault_connector || true
+          git clone --depth 1 https://github.com/rossigee/odoo-vault-connector.git /tmp/vault_tmp
+          if [ -d "/tmp/vault_tmp/vault_connector" ]; then
+            mv /tmp/vault_tmp/vault_connector addons/
+          fi
+          rm -rf /tmp/vault_tmp
 
       - name: Install module
         run: |
