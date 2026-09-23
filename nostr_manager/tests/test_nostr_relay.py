@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import requests
 from unittest.mock import MagicMock, patch
 
+import requests
 from odoo.exceptions import ValidationError
 from odoo.tests.common import TransactionCase
 

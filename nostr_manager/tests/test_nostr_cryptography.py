@@ -19,7 +19,9 @@ class TestNostrCryptography(TransactionCase):
         # Generate proper nsec from hex
         self.test_nsec = self.nostr_key_model._hex_to_nsec(self.test_private_key_hex)
         # Generate corresponding npub
-        test_public_key_hex = self.nostr_key_model._derive_public_key(self.test_private_key_hex)
+        test_public_key_hex = self.nostr_key_model._derive_public_key(
+            self.test_private_key_hex
+        )
         self.test_npub = self.nostr_key_model._hex_to_npub(test_public_key_hex)
 
     def test_nsec_to_hex_conversion(self):

@@ -98,7 +98,7 @@ class TestNostrWizards(TransactionCase):
         # Generate valid nsec using known test hex
         test_hex = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
         valid_nsec = self.nostr_key_model._hex_to_nsec(test_hex)
-        
+
         # Valid nsec import
         wizard = self.import_wizard_model.create(
             {

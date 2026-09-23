@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from unittest.mock import patch
+
 from odoo.exceptions import ValidationError
 from odoo.tests.common import TransactionCase
 
