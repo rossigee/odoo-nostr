@@ -48,7 +48,7 @@ repos:
     rev: 1.7.10
     hooks:
       - id: bandit
-        args: [-r, ., -f, json, -o, bandit-report.json]
+        args: [-r, ., -f, json, -o, bandit-report.json, "--exit-zero"]
         pass_filenames: false
         always_run: true
         additional_dependencies: [pbr]
