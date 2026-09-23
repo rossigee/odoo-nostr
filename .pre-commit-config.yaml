@@ -50,3 +50,4 @@ repos:
         args: [-r, ., -f, json, -o, bandit-report.json]
         pass_filenames: false
         always_run: true
+        additional_dependencies: [pbr]
