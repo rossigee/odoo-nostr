@@ -33,17 +33,17 @@ jobs:
 
     steps:
       - name: Checkout module
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: nostr_manager
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Cache pip packages
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
@@ -70,7 +70,7 @@ jobs:
             libxcb1-dev
 
       - name: Checkout Odoo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: odoo/odoo
           ref: ${{ matrix.odoo-version }}
@@ -132,7 +132,7 @@ jobs:
           coverage xml --include="../addons/nostr_manager/*" -o coverage.xml
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v7
         with:
           file: ./odoo/coverage.xml
           flags: unittests
@@ -168,7 +168,7 @@ jobs:
           safety check --json --output safety-report.json || true
 
       - name: Upload test artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-results-${{ matrix.odoo-version }}-py${{ matrix.python-version }}
@@ -181,10 +181,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout module
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v7
         with:
           python-version: "3.11"
 
@@ -225,9 +225,9 @@ jobs:
   pre-commit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
 
