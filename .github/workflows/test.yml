@@ -146,7 +146,7 @@ jobs:
         run: |
           cd odoo
           python odoo-bin -d test_db --update=nostr_manager \
-            --stop-after-init --addons-path=../addons
+            --stop-after-init --addons-path="${GITHUB_WORKSPACE}/addons,${GITHUB_WORKSPACE}/odoo/addons"
         env:
           PGHOST: localhost
           PGPORT: 5432
