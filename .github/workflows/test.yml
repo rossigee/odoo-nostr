@@ -98,21 +98,15 @@ jobs:
             ln -s $(pwd)/vault_connector addons/vault_connector
           fi
 
-      - name: Initialize Odoo database
-        run: |
-          cd odoo
-          python odoo-bin -d test_db --init=base --stop-after-init --addons-path=../addons
-        env:
-          PGHOST: localhost
-          PGPORT: 5432
-          PGUSER: odoo
-          PGPASSWORD: odoo
-
       - name: Install module
         run: |
           cd odoo
-          python odoo-bin -d test_db --init=nostr_manager \
-            --stop-after-init --addons-path=../addons --log-level=info
+          python odoo-bin -d test_db \
+            --no-http \
+            --stop-after-init \
+            --addons-path=../addons \
+            --log-level=info \
+            -i nostr_manager
         env:
           PGHOST: localhost
           PGPORT: 5432
