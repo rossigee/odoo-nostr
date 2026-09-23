@@ -87,7 +87,7 @@ jobs:
       - name: Prepare Odoo addons path
         run: |
           mkdir -p addons
-          cp -r nostr_manager addons/
+          cp -r nostr_manager/nostr_manager addons/
           git clone --depth 1 https://github.com/rossigee/odoo-vault-connector.git /tmp/vault_tmp
           if [ -d "/tmp/vault_tmp/vault_connector" ]; then
             mv /tmp/vault_tmp/vault_connector addons/
