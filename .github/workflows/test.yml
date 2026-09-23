@@ -69,20 +69,12 @@ jobs:
             libfribidi-dev \
             libxcb1-dev
 
-      - name: Checkout Odoo and web
+      - name: Checkout Odoo
         uses: actions/checkout@v4
         with:
           repository: odoo/odoo
           ref: ${{ matrix.odoo-version }}
           path: odoo
-          depth: 1
-
-      - name: Checkout Odoo web
-        uses: actions/checkout@v4
-        with:
-          repository: odoo/odoo-web
-          ref: ${{ matrix.odoo-version }}
-          path: odoo-web
           depth: 1
 
       - name: Install Python dependencies
@@ -105,7 +97,6 @@ jobs:
           if [ -d "vault_connector" ]; then
             ln -s $(pwd)/vault_connector addons/vault_connector
           fi
-          ln -s $(pwd)/odoo-web addons/web
 
       - name: Install module
         run: |
@@ -113,7 +104,7 @@ jobs:
           python odoo-bin -d test_db \
             --no-http \
             --stop-after-init \
-            --addons-path=../addons \
+            --addons-path=../addons,./addons \
             --log-level=info \
             -i nostr_manager
         env:
