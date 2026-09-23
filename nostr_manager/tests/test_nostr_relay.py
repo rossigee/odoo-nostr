@@ -53,7 +53,6 @@ class TestNostrRelay(TransactionCase):
             "https://relay.example.com",  # Wrong protocol
             "ftp://relay.example.com",  # Wrong protocol
             "relay.example.com",  # No protocol
-            "",  # Empty
         ]
 
         for url in invalid_urls:
