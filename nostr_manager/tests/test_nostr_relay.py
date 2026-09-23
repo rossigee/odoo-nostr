@@ -120,7 +120,7 @@ class TestNostrRelay(TransactionCase):
 
         # Should return error notification
         self.assertEqual(result["type"], "ir.actions.client")
-        self.assertIn("Failed to connect", result["params"]["message"])
+        self.assertIn("Connection failed", result["params"]["message"])
 
     @patch("requests.get")
     def test_relay_nip11_info_parsing(self, mock_get):
@@ -278,7 +278,7 @@ class TestNostrRelay(TransactionCase):
         result = relay.action_test_connection()
 
         self.assertEqual(relay.connection_status, "error")
-        self.assertIn("timeout", result["params"]["message"].lower())
+        self.assertIn("timed out", result["params"]["message"].lower())
 
     def test_relay_search_and_filtering(self):
         """Test relay search and filtering capabilities"""
