@@ -7,22 +7,19 @@
         <field name="arch" type="xml">
             <form string="Generate Nostr Key">
                 <header>
-                    <!-- Step 1 buttons -->
                     <button name="action_generate_keys" string="Generate Keys" type="object"
-                            class="btn-primary" attrs="{'invisible': [('step', '!=', 'step1')]}"/>
+                            class="btn-primary" invisible="step != 'step1'"/>
 
-                    <!-- Step 2 buttons -->
                     <button name="action_finish" string="Done" type="object"
-                            class="btn-primary" attrs="{'invisible': [('step', '!=', 'step2')]}"/>
+                            class="btn-primary" invisible="step != 'step2'"/>
                     <button name="action_back" string="Back" type="object"
-                            class="btn-secondary" attrs="{'invisible': [('step', '!=', 'step2')]}"/>
+                            class="btn-secondary" invisible="step != 'step2'"/>
 
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
                 </header>
 
                 <sheet>
-                    <!-- Step 1: Key Details -->
-                    <div attrs="{'invisible': [('step', '!=', 'step1')]}">
+                    <div invisible="step != 'step1'">
                         <div class="oe_title">
                             <h1>Generate New Nostr Key</h1>
                             <p>Enter the details for your new Nostr key pair</p>
@@ -34,10 +31,9 @@
                         </group>
                     </div>
 
-                    <!-- Step 2: Generated Keys -->
-                    <div attrs="{'invisible': [('step', '!=', 'step2')]}">
+                    <div invisible="step != 'step2'">
                         <div class="oe_title">
-                            <h1>⚠️ Save Your Keys!</h1>
+                            <h1>Save Your Keys!</h1>
                             <p><strong>This is the only time your private key will be shown.</strong></p>
                         </div>
 
@@ -61,7 +57,6 @@
                         </group>
                     </div>
 
-                    <!-- Hidden fields -->
                     <field name="step" invisible="1"/>
                 </sheet>
             </form>

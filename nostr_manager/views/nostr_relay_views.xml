@@ -50,7 +50,7 @@
                         </group>
                         <group string="Connection Info">
                             <field name="last_connected"/>
-                            <field name="connection_error" attrs="{'invisible': [('connection_error', '=', False)]}"/>
+                            <field name="connection_error" invisible="not connection_error"/>
                         </group>
                     </group>
 

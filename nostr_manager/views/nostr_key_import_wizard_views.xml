@@ -7,22 +7,19 @@
         <field name="arch" type="xml">
             <form string="Import Nostr Key">
                 <header>
-                    <!-- Step 1 buttons -->
                     <button name="action_validate_import" string="Validate &amp; Continue" type="object"
-                            class="btn-primary" attrs="{'invisible': [('step', '!=', 'step1')]}"/>
+                            class="btn-primary" invisible="step != 'step1'"/>
 
-                    <!-- Step 2 buttons -->
                     <button name="action_import_key" string="Import Key" type="object"
-                            class="btn-primary" attrs="{'invisible': [('step', '!=', 'step2')]}"/>
+                            class="btn-primary" invisible="step != 'step2'"/>
                     <button name="action_back" string="Back" type="object"
-                            class="btn-secondary" attrs="{'invisible': [('step', '!=', 'step2')]}"/>
+                            class="btn-secondary" invisible="step != 'step2'"/>
 
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
                 </header>
 
                 <sheet>
-                    <!-- Step 1: Import Details -->
-                    <div attrs="{'invisible': [('step', '!=', 'step1')]}">
+                    <div invisible="step != 'step1'">
                         <div class="oe_title">
                             <h1>Import Existing Nostr Key</h1>
                             <p>Import an existing nsec (private key) or npub (public key only)</p>
@@ -35,15 +32,15 @@
 
                         <group string="Key to Import (choose one)">
                             <field name="import_nsec" placeholder="nsec1... (private key - will derive npub automatically)"
-                                   attrs="{'required': [('import_npub', '=', False)]}"/>
-                            <div class="text-muted" attrs="{'invisible': [('import_nsec', '=', False)]}">
-                                <small>🔐 Importing nsec will give you full signing capability</small>
+                                   required="import_npub == False"/>
+                            <div class="text-muted" invisible="not import_nsec">
+                                <small>Importing nsec will give you full signing capability</small>
                             </div>
 
                             <field name="import_npub" placeholder="npub1... (public key only - read-only contact)"
-                                   attrs="{'required': [('import_nsec', '=', False)]}"/>
-                            <div class="text-muted" attrs="{'invisible': [('import_npub', '=', False)]}">
-                                <small>👁️ Importing npub creates a read-only contact (no signing)</small>
+                                   required="import_nsec == False"/>
+                            <div class="text-muted" invisible="not import_npub">
+                                <small>Importing npub creates a read-only contact (no signing)</small>
                             </div>
                         </group>
 
@@ -53,8 +50,7 @@
                         </div>
                     </div>
 
-                    <!-- Step 2: Confirm Import -->
-                    <div attrs="{'invisible': [('step', '!=', 'step2')]}">
+                    <div invisible="step != 'step2'">
                         <div class="oe_title">
                             <h1>Confirm Key Import</h1>
                             <p>Review the key details before importing</p>
@@ -69,7 +65,7 @@
                                 <small>This will be your public Nostr identity</small>
                             </div>
 
-                            <div attrs="{'invisible': [('import_type', '!=', 'nsec')]}">
+                            <div invisible="import_type != 'nsec'">
                                 <label for="imported_nsec" string="Private Key (nsec)"/>
                                 <field name="imported_nsec" readonly="1" widget="CopyClipboardChar"/>
                                 <div class="text-muted">
@@ -78,18 +74,17 @@
                             </div>
                         </group>
 
-                        <div class="alert alert-success" role="status" attrs="{'invisible': [('import_type', '!=', 'nsec')]}">
+                        <div class="alert alert-success" role="status" invisible="import_type != 'nsec'">
                             <strong>Private Key Import:</strong> Your nsec will be securely stored in the vault
                             and the npub was automatically derived.
                         </div>
 
-                        <div class="alert alert-info" attrs="{'invisible': [('import_type', '!=', 'npub')]}">
+                        <div class="alert alert-info" invisible="import_type != 'npub'">
                             <strong>Public Key Only:</strong> This creates a read-only contact.
                             You cannot sign messages with this key.
                         </div>
                     </div>
 
-                    <!-- Hidden fields -->
                     <field name="step" invisible="1"/>
                 </sheet>
             </form>
