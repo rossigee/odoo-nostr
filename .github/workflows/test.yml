@@ -84,19 +84,11 @@ jobs:
           pip install secp256k1 coincurve
           pip install coverage pytest-odoo
 
-      - name: Setup vault_connector dependency
-        run: |
-          gh_repo="https://github.com/rossigee/odoo-vault-connector.git"
-          git clone "$gh_repo" vault_connector || \
-            echo "Vault connector not available, using mock"
-
       - name: Prepare Odoo addons path
         run: |
           mkdir -p addons
-          ln -s $(pwd)/nostr_manager addons/nostr_manager
-          if [ -d "vault_connector" ]; then
-            ln -s $(pwd)/vault_connector addons/vault_connector
-          fi
+          cp -r nostr_manager addons/
+          git clone --depth 1 https://github.com/rossigee/odoo-vault-connector.git addons/vault_connector || true
 
       - name: Install module
         run: |
