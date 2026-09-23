@@ -273,9 +273,7 @@ class TestNostrKeyManagement(TransactionCase):
             "odoo.addons.nostr_manager.models.nostr_key.NostrKey._derive_public_key"
         ) as mock_derive:
             # Simulate library not available - should use fallback
-            mock_derive.return_value = (
-                "fallback_public_key_hex" + "0" * 36
-            )  # 64 chars total
+            mock_derive.return_value = "a" * 64  # Valid 64-char hex string
 
             with patch(
                 "odoo.addons.nostr_manager.models.nostr_key.NostrKey._store_private_key_in_vault"
