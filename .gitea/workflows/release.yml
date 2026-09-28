@@ -147,9 +147,9 @@ jobs:
       - name: Install MinIO client
         run: |
           MC_VERSION="RELEASE.2025-08-13T08-35-41Z"
-          curl -fsSL "https://github.com/minio/mc/releases/download/${MC_VERSION}/mc.linux-amd64.${MC_VERSION}" -o /tmp/mc
-          chmod +x /tmp/mc
-          /tmp/mc --version
+          curl -fsSL "https://github.com/minio/mc/releases/download/${MC_VERSION}/mc.linux-amd64.${MC_VERSION}" -o mcli
+          chmod +x mcli
+          mcli --version
 
       - name: Upload to MinIO
         env:
@@ -159,8 +159,9 @@ jobs:
           MINIO_BUCKET: ${{ secrets.MINIO_BUCKET }}
           ODOO_VERSION: "17.0"
         run: |
+        export PATH=${HOME}/.local/bin:$PATH
           MINIO_ENDPOINT=$(echo "${MINIO_HOST}" | sed -E 's|^https?://||')
-          /tmp/mc alias set cdn \
+          mcli alias set cdn \
             "https://${MINIO_ENDPOINT}" \
             "${MINIO_ACCESS_KEY}" \
             "${MINIO_SECRET_KEY}" \
@@ -170,7 +171,7 @@ jobs:
           ZIPFILE="dist/${REPO_NAME}-${{ steps.version.outputs.version }}.zip"
 
           echo "Uploading ${REPO_NAME}..."
-          /tmp/mc cp --insecure "$ZIPFILE" \
+          mcli cp --insecure "$ZIPFILE" \
             "cdn/${MINIO_BUCKET}/odoo/custom-modules/${ODOO_VERSION}/${REPO_NAME}/${{ steps.version.outputs.version }}.zip"
-          /tmp/mc cp --insecure "$ZIPFILE" \
+          mcli cp --insecure "$ZIPFILE" \
             "cdn/${MINIO_BUCKET}/odoo/custom-modules/${ODOO_VERSION}/${REPO_NAME}/latest.zip"
