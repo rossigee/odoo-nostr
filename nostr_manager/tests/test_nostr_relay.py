@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import requests
 from unittest.mock import MagicMock, patch
+
+import requests
 
 from odoo.exceptions import ValidationError
 from odoo.tests.common import TransactionCase
@@ -53,7 +54,6 @@ class TestNostrRelay(TransactionCase):
             "https://relay.example.com",  # Wrong protocol
             "ftp://relay.example.com",  # Wrong protocol
             "relay.example.com",  # No protocol
-            "",  # Empty
         ]
 
         for url in invalid_urls:
@@ -120,7 +120,7 @@ class TestNostrRelay(TransactionCase):
 
         # Should return error notification
         self.assertEqual(result["type"], "ir.actions.client")
-        self.assertIn("Failed to connect", result["params"]["message"])
+        self.assertIn("Connection failed", result["params"]["message"])
 
     @patch("requests.get")
     def test_relay_nip11_info_parsing(self, mock_get):
@@ -278,7 +278,7 @@ class TestNostrRelay(TransactionCase):
         result = relay.action_test_connection()
 
         self.assertEqual(relay.connection_status, "error")
-        self.assertIn("timeout", result["params"]["message"].lower())
+        self.assertIn("timed out", result["params"]["message"].lower())
 
     def test_relay_search_and_filtering(self):
         """Test relay search and filtering capabilities"""

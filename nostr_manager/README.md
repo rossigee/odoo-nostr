@@ -3,7 +3,7 @@
 [![Test Status](https://github.com/YOUR_ORG/nostr-manager/workflows/Odoo%20Module%20Tests/badge.svg)](https://github.com/YOUR_ORG/nostr-manager/actions)
 [![codecov](https://codecov.io/gh/YOUR_ORG/nostr-manager/branch/16.0/graph/badge.svg)](https://codecov.io/gh/YOUR_ORG/nostr-manager)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-[![Odoo Version](https://img.shields.io/badge/Odoo-16.0-purple.svg)](https://github.com/odoo/odoo/tree/16.0)
+[![Odoo Version](https://img.shields.io/badge/Odoo-17.0-purple.svg)](https://github.com/odoo/odoo/tree/17.0)
 
 A comprehensive Nostr client module for Odoo that provides secure key management, relay infrastructure, and business partner integration for the decentralized Nostr protocol.
 
@@ -37,7 +37,7 @@ A comprehensive Nostr client module for Odoo that provides secure key management
 
 ## 📋 Requirements
 
-- **Odoo**: 16.0+
+- **Odoo**: 17.0+
 - **Python**: 3.9+
 - **Dependencies**:
   - `secp256k1` (cryptographic operations)

@@ -25,8 +25,8 @@
             <form string="Nostr Key">
                 <sheet>
                     <div class="oe_title">
-                        <h1><field name="name" attrs="{'readonly': [('id', '!=', False)]}"/></h1>
-                        <h3 class="text-muted"><field name="partner_id" attrs="{'readonly': [('id', '!=', False)]}"/></h3>
+                        <h1><field name="name" readonly="id"/></h1>
+                        <h3 class="text-muted"><field name="partner_id" readonly="id"/></h3>
                     </div>
 
 
@@ -111,7 +111,7 @@
                         </group>
                         <group>
                             <button name="action_view_nostr_keys" string="View All Keys" type="object"
-                                    class="btn-primary" attrs="{'invisible': [('nostr_key_count', '=', 0)]}"/>
+                                    class="btn-primary" invisible="nostr_key_count == 0"/>
                             <button name="generate_nostr_key" string="Generate New Key" type="object"
                                     class="btn-success"/>
                         </group>

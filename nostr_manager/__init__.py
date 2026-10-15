@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from . import models, wizards, tests
+from . import models, tests, wizards
