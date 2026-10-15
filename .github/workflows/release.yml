@@ -1,3 +1,4 @@
+# yamllint disable rule:truthy, rule:line-length
 ---
 name: Release
 
@@ -5,11 +6,18 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release'
+        required: true
 
 jobs:
   create-release:
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: >-
+      startsWith(github.ref, 'refs/tags/v') ||
+      github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout
@@ -20,26 +28,31 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
-          python-version: "3.9"
+          python-version: "3.11"
 
       - name: Extract version from tag
         id: version
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            TAG="${{ github.event.inputs.tag }}"
+          else
+            TAG="${GITHUB_REF#refs/tags/}"
+          fi
+          VERSION=${TAG#v}
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Version: $VERSION"
 
       - name: Validate version matches manifest
         run: |
-          MANIFEST_VERSION=$(python -c "
+          MANIFEST_VERSION=$(python -c '
           import ast
-          with open('nostr_manager/__manifest__.py', 'r') as f:
+          with open("nostr_manager/__manifest__.py", "r") as f:
               manifest = ast.literal_eval(f.read())
-          print(manifest['version'])
-          ")
+          print(manifest["version"])
+          ')
 
           if [ "${{ steps.version.outputs.version }}" != "$MANIFEST_VERSION" ]; then
-            echo "ERROR: Tag version (${{ steps.version.outputs.version }}) doesn't match manifest"
+            echo "ERROR: Tag version does not match manifest"
             exit 1
           fi
 
@@ -81,42 +94,42 @@ jobs:
             nostr_manager/ release/nostr_manager/
 
           cd release
-          tar -czf nostr_manager-v${{ steps.version.outputs.version }}.tar.gz nostr_manager/
-          zip -r nostr_manager-v${{ steps.version.outputs.version }}.zip nostr_manager/
+          tar -czf "nostr_manager-v${{ steps.version.outputs.version }}.tar.gz" nostr_manager/
+          zip -r "nostr_manager-v${{ steps.version.outputs.version }}.zip" nostr_manager/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
           tag_name: v${{ steps.version.outputs.version }}
-          name: Nostr Manager v${{ steps.version.outputs.version }}
+          name: "Nostr Manager v${{ steps.version.outputs.version }}"
           body: ${{ steps.changelog.outputs.changelog }}
           draft: false
-          prerelease: ${{ contains(steps.version.outputs.version, 'alpha')
-            || contains(steps.version.outputs.version, 'beta')
-            || contains(steps.version.outputs.version, 'rc') }}
+          prerelease: >-
+            ${{ contains(steps.version.outputs.version, 'alpha')
+               || contains(steps.version.outputs.version, 'beta')
+               || contains(steps.version.outputs.version, 'rc') }}
           files: |
             release/nostr_manager-v${{ steps.version.outputs.version }}.tar.gz
             release/nostr_manager-v${{ steps.version.outputs.version }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish to OCA/Odoo Community
-        if: >
-          !contains(steps.version.outputs.version, 'alpha')
-          && !contains(steps.version.outputs.version, 'beta')
-        run: |
-          echo "Stable release v${{ steps.version.outputs.version }} created!"
-
   announce-release:
     needs: create-release
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: >-
+      startsWith(github.ref, 'refs/tags/v') ||
+      github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Extract version
         id: version
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            VERSION="${{ github.event.inputs.tag }}"
+          else
+            VERSION=${GITHUB_REF#refs/tags/v}
+          fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Create announcement template
@@ -142,9 +155,9 @@ jobs:
 
           ## Links
 
-          - GitHub: https://github.com/YOUR_ORG/nostr-manager
-          - Issues: https://github.com/YOUR_ORG/nostr-manager/issues
-          - Release: https://github.com/YOUR_ORG/nostr-manager/releases/tag/v${{ steps.version.outputs.version }}
+          - GitHub: https://github.com/rossigee/odoo-nostr
+          - Issues: https://github.com/rossigee/odoo-nostr/issues
+          - Release: https://github.com/rossigee/odoo-nostr/releases/tag/v${{ steps.version.outputs.version }}
 
           Built for the Nostr and Odoo communities
           EOF
