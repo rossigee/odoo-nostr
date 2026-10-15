@@ -159,7 +159,7 @@ jobs:
           MINIO_BUCKET: ${{ secrets.MINIO_BUCKET }}
           ODOO_VERSION: "17.0"
         run: |
-        export PATH=${HOME}/.local/bin:$PATH
+          export PATH=${HOME}/.local/bin:$PATH
           MINIO_ENDPOINT=$(echo "${MINIO_HOST}" | sed -E 's|^https?://||')
           mcli alias set cdn \
             "https://${MINIO_ENDPOINT}" \
@@ -171,7 +171,8 @@ jobs:
           ZIPFILE="dist/${REPO_NAME}-${{ steps.version.outputs.version }}.zip"
 
           echo "Uploading ${REPO_NAME}..."
+          DEST_BASE="cdn/${MINIO_BUCKET}/odoo/custom-modules/${ODOO_VERSION}/${REPO_NAME}"
           mcli cp --insecure "$ZIPFILE" \
-            "cdn/${MINIO_BUCKET}/odoo/custom-modules/${ODOO_VERSION}/${REPO_NAME}/${{ steps.version.outputs.version }}.zip"
+            "${DEST_BASE}/${{ steps.version.outputs.version }}.zip"
           mcli cp --insecure "$ZIPFILE" \
-            "cdn/${MINIO_BUCKET}/odoo/custom-modules/${ODOO_VERSION}/${REPO_NAME}/latest.zip"
+            "${DEST_BASE}/latest.zip"
