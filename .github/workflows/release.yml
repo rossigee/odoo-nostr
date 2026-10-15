@@ -1,3 +1,4 @@
+# yamllint disable rule:truthy, rule:line-length
 ---
 name: Release
 
@@ -14,7 +15,9 @@ on:
 jobs:
   create-release:
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    if: >-
+      startsWith(github.ref, 'refs/tags/v') ||
+      github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout
@@ -41,15 +44,15 @@ jobs:
 
       - name: Validate version matches manifest
         run: |
-          MANIFEST_VERSION=$(python -c "
+          MANIFEST_VERSION=$(python -c '
           import ast
-          with open('nostr_manager/__manifest__.py', 'r') as f:
+          with open("nostr_manager/__manifest__.py", "r") as f:
               manifest = ast.literal_eval(f.read())
-          print(manifest['version'])
-          ")
+          print(manifest["version"])
+          ')
 
           if [ "${{ steps.version.outputs.version }}" != "$MANIFEST_VERSION" ]; then
-            echo "ERROR: Tag version (${{ steps.version.outputs.version }}) doesn't match manifest"
+            echo "ERROR: Tag version does not match manifest"
             exit 1
           fi
 
@@ -91,19 +94,20 @@ jobs:
             nostr_manager/ release/nostr_manager/
 
           cd release
-          tar -czf nostr_manager-v${{ steps.version.outputs.version }}.tar.gz nostr_manager/
-          zip -r nostr_manager-v${{ steps.version.outputs.version }}.zip nostr_manager/
+          tar -czf "nostr_manager-v${{ steps.version.outputs.version }}.tar.gz" nostr_manager/
+          zip -r "nostr_manager-v${{ steps.version.outputs.version }}.zip" nostr_manager/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
           tag_name: v${{ steps.version.outputs.version }}
-          name: Nostr Manager v${{ steps.version.outputs.version }}
+          name: "Nostr Manager v${{ steps.version.outputs.version }}"
           body: ${{ steps.changelog.outputs.changelog }}
           draft: false
-          prerelease: ${{ contains(steps.version.outputs.version, 'alpha')
-            || contains(steps.version.outputs.version, 'beta')
-            || contains(steps.version.outputs.version, 'rc') }}
+          prerelease: >-
+            ${{ contains(steps.version.outputs.version, 'alpha')
+               || contains(steps.version.outputs.version, 'beta')
+               || contains(steps.version.outputs.version, 'rc') }}
           files: |
             release/nostr_manager-v${{ steps.version.outputs.version }}.tar.gz
             release/nostr_manager-v${{ steps.version.outputs.version }}.zip
@@ -113,7 +117,9 @@ jobs:
   announce-release:
     needs: create-release
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    if: >-
+      startsWith(github.ref, 'refs/tags/v') ||
+      github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Extract version
