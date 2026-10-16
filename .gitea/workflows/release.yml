@@ -1,3 +1,5 @@
+# yamllint disable rule:truthy
+---
 name: Release
 
 on:
@@ -14,20 +16,20 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v7
-      with:
-        fetch-depth: 0
-    - uses: https://git.golder.lan/rossgolderltd/odoo-release-action@v1
-      with:
-        strategy: repo
-        name: odoo-nostr
-        odoo_version: '17.0'
-        validate: warn
-        minio_endpoint: ${{ secrets.MINIO_HOST }}
-        minio_access_key: ${{ secrets.MINIO_ACCESS_KEY }}
-        minio_secret_key: ${{ secrets.MINIO_SECRET_KEY }}
-        minio_bucket: ${{ secrets.MINIO_BUCKET }}
-        minio_path_prefix: odoo/custom-modules
-        publish: 'true'
-        create_release: 'true'
-        release_token: ${{ secrets.GITEA_TOKEN }}
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: https://git.golder.lan/rossgolderltd/odoo-release-action@v1
+        with:
+          strategy: repo
+          name: odoo-nostr
+          odoo_version: '17.0'
+          validate: warn
+          minio_endpoint: ${{ secrets.MINIO_HOST }}
+          minio_access_key: ${{ secrets.MINIO_ACCESS_KEY }}
+          minio_secret_key: ${{ secrets.MINIO_SECRET_KEY }}
+          minio_bucket: ${{ secrets.MINIO_BUCKET }}
+          minio_path_prefix: odoo/custom-modules
+          publish: 'true'
+          create_release: 'true'
+          release_token: ${{ secrets.GITEA_TOKEN }}
