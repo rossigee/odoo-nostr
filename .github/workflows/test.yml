@@ -232,10 +232,4 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install pre-commit
-        run: pip install pre-commit pbr
-
-      - name: Run pre-commit
-        run: |
-          pre-commit install
-          pre-commit run --all-files
+      - uses: pre-commit/action@v3.0.1
