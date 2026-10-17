@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: https://git.golder.lan/rossgolderltd/odoo-release-action@v1
+      - uses: https://git.golder.lan/rossgolderltd/odoo-release-action@v2
         with:
           strategy: repo
           name: odoo-nostr
