@@ -5,7 +5,7 @@
         <field name="name">nostr.key.tree</field>
         <field name="model">nostr.key</field>
         <field name="arch" type="xml">
-            <tree string="Nostr Keys" decoration-info="vault_key_id == False" decoration-success="vault_key_id != False">
+            <list string="Nostr Keys" decoration-info="vault_key_id == False" decoration-success="vault_key_id != False">
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="key_type"/>
@@ -13,7 +13,7 @@
                 <field name="public_key"/>
                 <field name="created_date"/>
                 <field name="vault_key_id" invisible="1"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -81,7 +81,7 @@
     <record id="action_nostr_key" model="ir.actions.act_window">
         <field name="name">Nostr Keys</field>
         <field name="res_model">nostr.key</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_nostr_key_search"/>
         <field name="context">{'default_create_action': 'wizard'}</field>
         <field name="help" type="html">
@@ -117,12 +117,12 @@
                         </group>
                     </group>
                     <field name="nostr_key_ids" readonly="1">
-                        <tree>
+                        <list>
                             <field name="name"/>
                             <field name="key_type"/>
                             <field name="public_key"/>
                             <field name="created_date"/>
-                        </tree>
+                        </list>
                     </field>
                 </page>
             </notebook>

@@ -5,7 +5,7 @@
         <field name="name">nostr.relay.tree</field>
         <field name="model">nostr.relay</field>
         <field name="arch" type="xml">
-            <tree string="Nostr Relays" decoration-success="connection_status == 'connected'"
+            <list string="Nostr Relays" decoration-success="connection_status == 'connected'"
                   decoration-danger="connection_status == 'error'" decoration-muted="is_active == False">
                 <field name="name"/>
                 <field name="url"/>
@@ -16,7 +16,7 @@
                 <field name="last_connected"/>
                 <field name="event_count_read"/>
                 <field name="event_count_write"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -112,7 +112,7 @@
     <record id="action_nostr_relay" model="ir.actions.act_window">
         <field name="name">Nostr Relays</field>
         <field name="res_model">nostr.relay</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_nostr_relay_search"/>
         <field name="context">{'search_default_active': 1}</field>
         <field name="help" type="html">
